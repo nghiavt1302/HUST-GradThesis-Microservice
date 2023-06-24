@@ -19,6 +19,7 @@ public class ProductController {
     }
     @PostMapping
     public String test1() {
+        System.out.println("123g");
         return "POST test" + env.getProperty("local.server.port");
     }
 }
