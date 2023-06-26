@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.UUID;
 
 @RestController
@@ -22,7 +23,7 @@ public class ProductCommandController {
         this.commandGateway = commandGateway;
     }
     @PostMapping
-    public String createProduct(@RequestBody CreateProductModel model) {
+    public String createProduct(@Valid @RequestBody CreateProductModel model) {
         CreateProductCommand createProductCommand = CreateProductCommand.builder()
                 .price(model.getPrice())
                 .quantity(model.getQuantity())
