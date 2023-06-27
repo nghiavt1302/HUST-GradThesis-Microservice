@@ -2,7 +2,9 @@ package com.nghiavt.productservice.core.database.repository;
 
 import com.nghiavt.productservice.core.model.ProductLookupEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public interface ProductLookupRepository extends JpaRepository<ProductLookupEntity, String> {
-    ProductLookupEntity findByProductIdAndTitle(String productId, String title);
+    ProductLookupEntity findByProductIdOrTitle(String productId, String title);
 }

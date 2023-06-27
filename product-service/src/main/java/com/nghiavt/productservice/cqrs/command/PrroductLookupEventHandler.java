@@ -19,7 +19,7 @@ public class PrroductLookupEventHandler {
 
     @EventHandler
     public void on(ProductCreatedEvent event){
-        ProductLookupEntity e = new ProductLookupEntity(event.getProductId(), event.getTitle());
-        productLookupRepository.save(e);
+        ProductLookupEntity entity = new ProductLookupEntity(event.getProductId(), event.getTitle());
+        productLookupRepository.save(entity);
     }
 }
