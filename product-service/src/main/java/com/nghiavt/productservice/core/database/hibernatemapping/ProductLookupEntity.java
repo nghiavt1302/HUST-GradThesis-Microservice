@@ -1,4 +1,4 @@
-package com.nghiavt.productservice.core.model;
+package com.nghiavt.productservice.core.database.hibernatemapping;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

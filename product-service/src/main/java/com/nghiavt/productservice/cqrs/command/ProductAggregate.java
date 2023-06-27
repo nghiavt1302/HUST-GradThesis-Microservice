@@ -38,6 +38,9 @@ public class ProductAggregate {
                 .build();
 //        BeanUtils.copyProperties(createProductCommand, productCreatedEvent);
         AggregateLifecycle.apply(productCreatedEvent);
+//        if (true){
+//            throw new Exception("Something goes wrong");
+//        }
     }
 
     @EventSourcingHandler

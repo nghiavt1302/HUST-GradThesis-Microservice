@@ -1,6 +1,6 @@
 package com.nghiavt.productservice.core.database.repository;
 
-import com.nghiavt.productservice.core.model.ProductLookupEntity;
+import com.nghiavt.productservice.core.database.hibernatemapping.ProductLookupEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ProductLookupRepository extends JpaRepository<ProductLookupEntity, String> {
