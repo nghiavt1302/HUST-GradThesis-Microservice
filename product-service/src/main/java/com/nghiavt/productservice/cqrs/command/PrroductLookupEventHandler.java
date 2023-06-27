@@ -2,7 +2,7 @@ package com.nghiavt.productservice.cqrs.command;
 
 import com.nghiavt.productservice.core.database.repository.ProductLookupRepository;
 import com.nghiavt.productservice.core.events.ProductCreatedEvent;
-import com.nghiavt.productservice.core.model.ProductLookupEntity;
+import com.nghiavt.productservice.core.database.hibernatemapping.ProductLookupEntity;
 import org.axonframework.config.ProcessingGroup;
 import org.axonframework.eventhandling.EventHandler;
 import org.springframework.stereotype.Component;
