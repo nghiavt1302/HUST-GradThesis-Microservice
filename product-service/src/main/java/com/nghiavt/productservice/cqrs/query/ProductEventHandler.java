@@ -1,17 +1,21 @@
 package com.nghiavt.productservice.cqrs.query;
 
+import com.nghiavt.common.events.ProductReservedEvent;
 import com.nghiavt.productservice.core.database.hibernatemapping.ProductEntity;
 import com.nghiavt.productservice.core.database.repository.ProductRepository;
 import com.nghiavt.productservice.core.events.ProductCreatedEvent;
 import org.axonframework.config.ProcessingGroup;
 import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.messaging.interceptors.ExceptionHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 @ProcessingGroup("product-group")
 public class ProductEventHandler {
+    private static final Logger LOG = LoggerFactory.getLogger((ProductEventHandler.class));
     private final ProductRepository productRepository;
 
     @Autowired
@@ -37,8 +41,18 @@ public class ProductEventHandler {
                         .price(event.getPrice())
                         .quantity(event.getQuantity())
                 .build());
-        if (true){
-            throw new Exception("Something goes wrong");
-        }
+//        if (true){
+//            throw new Exception("Something goes wrong");
+//        }
+    }
+
+    @EventHandler
+    public void on(ProductReservedEvent productReservedEvent){
+        ProductEntity productEntity= productRepository.findByProductId(productReservedEvent.getProductId());
+        productEntity.setQuantity(productEntity.getQuantity() - productReservedEvent.getQuantity());
+        productRepository.save(productEntity);
+
+        LOG.info("Product reserved event is called, product ID: " + productReservedEvent.getProductId()
+                + ", order ID: " + productReservedEvent.getOrderId());
     }
 }

@@ -14,7 +14,7 @@ import javax.validation.Valid;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/order/")
+@RequestMapping("/order")
 public class OrderCommandController {
     private final CommandGateway commandGateway;
 

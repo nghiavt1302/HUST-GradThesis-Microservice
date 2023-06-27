@@ -1,5 +1,7 @@
 package com.nghiavt.productservice.cqrs.command;
 
+import com.nghiavt.common.commands.ReverseProductCommand;
+import com.nghiavt.common.events.ProductReservedEvent;
 import com.nghiavt.productservice.core.events.ProductCreatedEvent;
 import com.nghiavt.productservice.cqrs.command.commandobject.CreateProductCommand;
 import org.axonframework.commandhandling.CommandHandler;
@@ -44,11 +46,30 @@ public class ProductAggregate {
 //        }
     }
 
+    @CommandHandler
+    public void handle(ReverseProductCommand reverseProductCommand){
+        if (quantity < reverseProductCommand.getQuantity()){
+            throw new IllegalArgumentException("Not enough number of items in stock.");
+        }
+        ProductReservedEvent productReservedEvent = ProductReservedEvent.builder()
+                .orderId(reverseProductCommand.getOrderId())
+                .userId(reverseProductCommand.getUserId())
+                .productId(reverseProductCommand.getProductId())
+                .quantity(reverseProductCommand.getQuantity())
+                .build();
+        AggregateLifecycle.apply(productReservedEvent);
+    }
+
     @EventSourcingHandler
     public void on(ProductCreatedEvent productCreatedEvent){
         this.productId = productCreatedEvent.getProductId();
         this.price = productCreatedEvent.getPrice();
         this.quantity = productCreatedEvent.getQuantity();
         this.title = productCreatedEvent.getTitle();
+    }
+
+    @EventSourcingHandler
+    public void on(ProductReservedEvent productReservedEvent){
+        this.quantity -= productReservedEvent.getQuantity();
     }
 }
