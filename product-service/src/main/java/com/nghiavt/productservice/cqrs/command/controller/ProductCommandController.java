@@ -1,7 +1,7 @@
 package com.nghiavt.productservice.cqrs.command.controller;
 
 import com.nghiavt.productservice.core.model.CreateProductModel;
-import com.nghiavt.productservice.cqrs.command.CreateProductCommand;
+import com.nghiavt.productservice.cqrs.command.commandobject.CreateProductCommand;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;

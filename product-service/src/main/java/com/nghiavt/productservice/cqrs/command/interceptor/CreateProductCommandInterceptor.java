@@ -2,7 +2,7 @@ package com.nghiavt.productservice.cqrs.command.interceptor;
 
 import com.nghiavt.productservice.core.database.repository.ProductLookupRepository;
 import com.nghiavt.productservice.core.database.hibernatemapping.ProductLookupEntity;
-import com.nghiavt.productservice.cqrs.command.CreateProductCommand;
+import com.nghiavt.productservice.cqrs.command.commandobject.CreateProductCommand;
 import org.axonframework.commandhandling.CommandMessage;
 import org.axonframework.messaging.MessageDispatchInterceptor;
 import org.slf4j.Logger;

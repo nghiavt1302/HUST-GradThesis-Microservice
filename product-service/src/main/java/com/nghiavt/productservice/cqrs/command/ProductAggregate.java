@@ -1,6 +1,7 @@
 package com.nghiavt.productservice.cqrs.command;
 
 import com.nghiavt.productservice.core.events.ProductCreatedEvent;
+import com.nghiavt.productservice.cqrs.command.commandobject.CreateProductCommand;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;

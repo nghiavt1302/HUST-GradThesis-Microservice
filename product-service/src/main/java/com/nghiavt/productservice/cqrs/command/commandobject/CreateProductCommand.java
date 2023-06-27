@@ -1,4 +1,4 @@
-package com.nghiavt.productservice.cqrs.command;
+package com.nghiavt.productservice.cqrs.command.commandobject;
 
 import lombok.Builder;
 import lombok.Data;
