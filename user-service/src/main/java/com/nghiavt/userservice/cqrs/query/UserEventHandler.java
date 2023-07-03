@@ -10,18 +10,18 @@ import org.springframework.stereotype.Component;
 public class UserEventHandler {
     @QueryHandler
     public User findUserPaymentDetails(FetchUserPaymentDetailQuery query) {
-
+        // Hard code, not using DB
         PaymentDetail paymentDetails = PaymentDetail.builder()
-                .cardNumber("123Card")
-                .cvv("123")
-                .name("SERGEY KARGOPOLOV")
+                .cardNumber("123456789")
+                .cvv("678")
+                .name("VU TRONG NGHIA")
                 .validUntilMonth(12)
                 .validUntilYear(2030)
                 .build();
 
         User user = User.builder()
-                .firstName("Sergey")
-                .lastName("Kargopolov")
+                .firstName("Nghia")
+                .lastName("Vu Trong")
                 .userId(query.getUserId())
                 .paymentDetail(paymentDetails)
                 .build();

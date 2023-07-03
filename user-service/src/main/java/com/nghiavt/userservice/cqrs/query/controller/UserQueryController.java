@@ -16,8 +16,8 @@ public class UserQueryController {
     @Autowired
     QueryGateway queryGateway;
 
-    @GetMapping("/{userId}/payment-details")
-    public User getUserPaymentDetails(@PathVariable String userId) {
+    @GetMapping("/{userId}/payment-detail")
+    public User getUserPaymentDetail(@PathVariable String userId) {
 
         FetchUserPaymentDetailQuery query = new FetchUserPaymentDetailQuery(userId);
 

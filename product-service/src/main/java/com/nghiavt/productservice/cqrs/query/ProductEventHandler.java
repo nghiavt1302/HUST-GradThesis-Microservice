@@ -41,9 +41,6 @@ public class ProductEventHandler {
                         .price(event.getPrice())
                         .quantity(event.getQuantity())
                 .build());
-//        if (true){
-//            throw new Exception("Something goes wrong");
-//        }
     }
 
     @EventHandler

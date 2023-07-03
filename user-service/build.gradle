@@ -29,7 +29,7 @@ dependencies {
 	implementation project(':common')
 	implementation 'org.axonframework:axon-spring-boot-starter:4.6.7'
 	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+//	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation group: 'com.google.guava', name: 'guava', version: '32.0.1-jre'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
