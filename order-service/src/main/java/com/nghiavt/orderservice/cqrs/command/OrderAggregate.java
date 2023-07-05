@@ -1,8 +1,12 @@
 package com.nghiavt.orderservice.cqrs.command;
 
+import com.nghiavt.orderservice.core.event.OrderApprovedEvent;
+import com.nghiavt.orderservice.core.event.OrderRejectedEvent;
 import com.nghiavt.orderservice.core.model.constants.OrderStatus;
 import com.nghiavt.orderservice.core.event.OrderCreatedEvent;
+import com.nghiavt.orderservice.cqrs.command.commandobject.ApproveOrderCommand;
 import com.nghiavt.orderservice.cqrs.command.commandobject.CreateOrderCommand;
+import com.nghiavt.orderservice.cqrs.command.commandobject.RejectOrderCommand;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
@@ -43,5 +47,27 @@ public class OrderAggregate {
         this.addressId = orderCreatedEvent.getAddressId();
         this.quantity = orderCreatedEvent.getQuantity();
         this.orderStatus = orderCreatedEvent.getOrderStatus();
+    }
+
+    @CommandHandler
+    public void handle(ApproveOrderCommand approveOrderCommand){
+        OrderApprovedEvent orderApprovedEvent = new OrderApprovedEvent(approveOrderCommand.getOrderId());
+        AggregateLifecycle.apply(orderApprovedEvent);
+    }
+
+    @EventSourcingHandler
+    protected void on(OrderApprovedEvent orderApprovedEvent){
+        this.orderStatus = orderApprovedEvent.getOrderStatus();
+    }
+
+    @CommandHandler
+    public void handle(RejectOrderCommand command){
+        OrderRejectedEvent event = new OrderRejectedEvent(command.getOrderId(), command.getReason());
+        AggregateLifecycle.apply(event);
+    }
+
+    @EventSourcingHandler
+    protected void on(OrderRejectedEvent event){
+        this.orderStatus = event.getOrderStatus();
     }
 }

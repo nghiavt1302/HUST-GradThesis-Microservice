@@ -1,5 +1,6 @@
 package com.nghiavt.productservice.cqrs.query;
 
+import com.nghiavt.common.events.ProductReservationCancelledEvent;
 import com.nghiavt.common.events.ProductReservedEvent;
 import com.nghiavt.productservice.core.database.hibernatemapping.ProductEntity;
 import com.nghiavt.productservice.core.database.repository.ProductRepository;
@@ -51,5 +52,13 @@ public class ProductEventHandler {
 
         LOG.info("Product reserved event is called, product ID: " + productReservedEvent.getProductId()
                 + ", order ID: " + productReservedEvent.getOrderId());
+    }
+
+    @EventHandler
+    public void on(ProductReservationCancelledEvent event){
+        ProductEntity curStoredProduct = productRepository.findByProductId(event.getProductId());
+        int newQuantity = curStoredProduct.getQuantity() + event.getQuantity();
+        curStoredProduct.setQuantity(newQuantity);
+        productRepository.save(curStoredProduct);
     }
 }

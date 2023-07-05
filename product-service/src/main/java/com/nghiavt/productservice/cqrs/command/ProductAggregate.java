@@ -1,6 +1,8 @@
 package com.nghiavt.productservice.cqrs.command;
 
+import com.nghiavt.common.commands.CancelProductReservationCommand;
 import com.nghiavt.common.commands.ReverseProductCommand;
+import com.nghiavt.common.events.ProductReservationCancelledEvent;
 import com.nghiavt.common.events.ProductReservedEvent;
 import com.nghiavt.productservice.core.events.ProductCreatedEvent;
 import com.nghiavt.productservice.cqrs.command.commandobject.CreateProductCommand;
@@ -71,5 +73,22 @@ public class ProductAggregate {
     @EventSourcingHandler
     public void on(ProductReservedEvent productReservedEvent){
         this.quantity -= productReservedEvent.getQuantity();
+    }
+
+    @CommandHandler
+    public void handle(CancelProductReservationCommand command){
+        ProductReservationCancelledEvent event = ProductReservationCancelledEvent.builder()
+                .orderId(command.getOrderId())
+                .productId(command.getProductId())
+                .quantity(command.getQuantity())
+                .userId(command.getUserId())
+                .reason(command.getReason())
+                .build();
+        AggregateLifecycle.apply(event);
+    }
+
+    @EventSourcingHandler
+    public void on(ProductReservationCancelledEvent event){
+        this.quantity += event.getQuantity();
     }
 }
