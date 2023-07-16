@@ -5,6 +5,7 @@ import com.nghiavt.orderservice.core.database.repository.OrderRepository;
 import com.nghiavt.orderservice.core.event.OrderApprovedEvent;
 import com.nghiavt.orderservice.core.event.OrderCreatedEvent;
 import com.nghiavt.orderservice.core.event.OrderRejectedEvent;
+import lombok.extern.slf4j.Slf4j;
 import org.axonframework.config.ProcessingGroup;
 import org.axonframework.eventhandling.EventHandler;
 import org.springframework.beans.BeanUtils;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @ProcessingGroup("order-group")
+@Slf4j
 public class OrderEventHandler {
     private final OrderRepository orderRepository;
 
@@ -23,8 +25,8 @@ public class OrderEventHandler {
     public void on(OrderCreatedEvent event) throws Exception {
         OrderEntity orderEntity = new OrderEntity();
         BeanUtils.copyProperties(event, orderEntity);
-
         this.orderRepository.save(orderEntity);
+        log.info("New order inserted to DB: " + orderEntity.toString());
     }
 
     @EventHandler

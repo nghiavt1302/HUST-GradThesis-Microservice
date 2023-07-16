@@ -2,7 +2,7 @@ package com.nghiavt.orderservice.saga;
 
 import com.nghiavt.common.commands.CancelProductReservationCommand;
 import com.nghiavt.common.commands.ProcessPaymentCommand;
-import com.nghiavt.common.commands.ReverseProductCommand;
+import com.nghiavt.common.commands.ReserveProductCommand;
 import com.nghiavt.common.events.PaymentProcessedEvent;
 import com.nghiavt.common.events.ProductReservationCancelledEvent;
 import com.nghiavt.common.events.ProductReservedEvent;
@@ -42,43 +42,45 @@ public class OrderSaga {
     @StartSaga
     @SagaEventHandler(associationProperty = "orderId")
     public void handle(OrderCreatedEvent orderCreatedEvent) {
-        ReverseProductCommand reverseProductCommand = ReverseProductCommand.builder()
+        ReserveProductCommand reserveProductCommand = ReserveProductCommand.builder()
                 .orderId(orderCreatedEvent.getOrderId())
                 .productId(orderCreatedEvent.getProductId())
                 .userId(orderCreatedEvent.getProductId())
                 .quantity(orderCreatedEvent.getQuantity())
                 .build();
 
-        LOG.info("Order created event handled, order ID: " + reverseProductCommand.getOrderId() +
-                ", product ID: " + reverseProductCommand.getProductId());
-        commandGateway.send(reverseProductCommand, new CommandCallback<ReverseProductCommand, Object>() {
+        LOG.info("Start SAGA: Order created event handled " + orderCreatedEvent.toString());
+        commandGateway.send(reserveProductCommand, new CommandCallback<ReserveProductCommand, Object>() {
             @Override
-            public void onResult(@Nonnull CommandMessage<? extends ReverseProductCommand> commandMessage,
+            public void onResult(@Nonnull CommandMessage<? extends ReserveProductCommand> commandMessage,
                                  @Nonnull CommandResultMessage<?> commandResultMessage) {
                 if (commandResultMessage.isExceptional()){
 
                 }
             }
         });
+        LOG.info("SAGA: Send reserve product command: " + reserveProductCommand.toString());
     }
 
     @SagaEventHandler(associationProperty = "orderId")
     public void handle(ProductReservedEvent productReservedEvent){
-        LOG.info("Product reserved event is called, order ID: " + productReservedEvent.getOrderId() +
-                ", product ID: " + productReservedEvent.getProductId());
+        LOG.info("Product reserved event is called " + productReservedEvent.toString());
         String userId = productReservedEvent.getUserId();
+        LOG.info("Send User Payment Detail Query, userId:" + userId);
         FetchUserPaymentDetailQuery query = new FetchUserPaymentDetailQuery(userId);
         User userWithPaymentDetail = null;
         try {
             userWithPaymentDetail = queryGateway.query(query, ResponseTypes.instanceOf(User.class)).join();
         } catch (Exception ex){
             LOG.error(ex.getMessage());
+            LOG.info("Could not fetch user payment details. Start Compensating transaction:...");
             cancelProductReserve(productReservedEvent, ex.getMessage());
             // Compensating transaction
             return;
         }
         if (userWithPaymentDetail == null){
             // Compensating transaction
+            LOG.info("Could not fetch user payment details. Start Compensating transaction:...");
             cancelProductReserve(productReservedEvent, "Could not fetch user payment details.");
             return;
         }
@@ -93,9 +95,10 @@ public class OrderSaga {
 
         String res = null;
         try {
-            res = commandGateway.sendAndWait(processPaymentCommand, 10, TimeUnit.SECONDS);
+            res = commandGateway.sendAndWait(processPaymentCommand, 120, TimeUnit.SECONDS);
         } catch (Exception ex){
             LOG.error(ex.getMessage());
+            LOG.info("Process payment failed. Start Compensating transaction...");
             // Compensating
             cancelProductReserve(productReservedEvent, ex.getMessage());
             return;
@@ -112,19 +115,22 @@ public class OrderSaga {
         ApproveOrderCommand approveOrderCommand =
                 new ApproveOrderCommand(paymentProcessedEvent.getOrderId());
         commandGateway.send(approveOrderCommand);
+        LOG.info("Send approve order command: " + approveOrderCommand.toString());
     }
 
     @EndSaga
     @SagaEventHandler(associationProperty = "orderId")
     public void handle(OrderApprovedEvent orderApprovedEvent){
-        LOG.info("Order is approved, order ID: {}", orderApprovedEvent.getOrderId());
-        LOG.info("Saga is completed, order ID: {}", orderApprovedEvent.getOrderId());
+        LOG.info("Order is approved, order ID: {}, status: {}",
+                orderApprovedEvent.getOrderId(), orderApprovedEvent.getOrderStatus());
+        LOG.info("SAGA is completed, order ID: {}", orderApprovedEvent.getOrderId());
     }
 
     @SagaEventHandler(associationProperty = "orderId")
     public void handle(ProductReservationCancelledEvent event){
         RejectOrderCommand command = new RejectOrderCommand(event.getOrderId(), event.getReason());
         commandGateway.send(command);
+        LOG.info("Send reject order command: " + command.toString());
     }
 
     private void cancelProductReserve(ProductReservedEvent productReservedEvent, String reason){
@@ -136,6 +142,7 @@ public class OrderSaga {
                 .reason(reason)
                 .build();
         commandGateway.send(cancel);
+        LOG.info("Send cancel product reservation command: " + cancel.toString());
     }
 
     @EndSaga

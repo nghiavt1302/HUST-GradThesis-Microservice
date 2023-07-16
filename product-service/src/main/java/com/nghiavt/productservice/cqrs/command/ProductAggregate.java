@@ -1,11 +1,12 @@
 package com.nghiavt.productservice.cqrs.command;
 
 import com.nghiavt.common.commands.CancelProductReservationCommand;
-import com.nghiavt.common.commands.ReverseProductCommand;
+import com.nghiavt.common.commands.ReserveProductCommand;
 import com.nghiavt.common.events.ProductReservationCancelledEvent;
 import com.nghiavt.common.events.ProductReservedEvent;
 import com.nghiavt.productservice.core.events.ProductCreatedEvent;
 import com.nghiavt.productservice.cqrs.command.commandobject.CreateProductCommand;
+import lombok.extern.slf4j.Slf4j;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
@@ -15,6 +16,7 @@ import org.axonframework.spring.stereotype.Aggregate;
 import java.math.BigDecimal;
 
 @Aggregate
+@Slf4j
 public class ProductAggregate {
     @AggregateIdentifier
     private String productId;
@@ -33,33 +35,30 @@ public class ProductAggregate {
                 createProductCommand.getTitle().isBlank()){
             throw new IllegalArgumentException("Title cannot be empty.");
         }
-        productId = createProductCommand.getProductId();
 
         ProductCreatedEvent productCreatedEvent = ProductCreatedEvent.builder()
-                .productId(productId)
+                .productId(createProductCommand.getProductId())
                 .quantity(createProductCommand.getQuantity())
                 .price(createProductCommand.getPrice())
                 .title(createProductCommand.getTitle())
                 .build();
 //        BeanUtils.copyProperties(createProductCommand, productCreatedEvent);
         AggregateLifecycle.apply(productCreatedEvent);
-//        if (true){
-//            throw new Exception("Something goes wrong");
-//        }
     }
 
     @CommandHandler
-    public void handle(ReverseProductCommand reverseProductCommand){
-        if (quantity < reverseProductCommand.getQuantity()){
+    public void handle(ReserveProductCommand reserveProductCommand){
+        if (quantity < reserveProductCommand.getQuantity()){
             throw new IllegalArgumentException("Not enough number of items in stock.");
         }
         ProductReservedEvent productReservedEvent = ProductReservedEvent.builder()
-                .orderId(reverseProductCommand.getOrderId())
-                .userId(reverseProductCommand.getUserId())
-                .productId(reverseProductCommand.getProductId())
-                .quantity(reverseProductCommand.getQuantity())
+                .orderId(reserveProductCommand.getOrderId())
+                .userId(reserveProductCommand.getUserId())
+                .productId(reserveProductCommand.getProductId())
+                .quantity(reserveProductCommand.getQuantity())
                 .build();
         AggregateLifecycle.apply(productReservedEvent);
+        log.info("Published product reserved event: " + productReservedEvent.toString());
     }
 
     @EventSourcingHandler

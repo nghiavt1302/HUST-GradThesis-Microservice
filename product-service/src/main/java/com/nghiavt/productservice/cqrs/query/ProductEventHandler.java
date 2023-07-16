@@ -46,10 +46,13 @@ public class ProductEventHandler {
 
     @EventHandler
     public void on(ProductReservedEvent productReservedEvent){
-        ProductEntity productEntity= productRepository.findByProductId(productReservedEvent.getProductId());
+        ProductEntity productEntity = productRepository.findByProductId(productReservedEvent.getProductId());
+        LOG.info("Product Reserved Event: current product quantity: {}", productEntity.getQuantity());
         productEntity.setQuantity(productEntity.getQuantity() - productReservedEvent.getQuantity());
         productRepository.save(productEntity);
-
+        // TEST log
+        ProductEntity savedProduct = productRepository.findByProductId(productReservedEvent.getProductId());
+        LOG.info("Product Reserved Event: updated product quantity: {}", savedProduct.getQuantity());
         LOG.info("Product reserved event is called, product ID: " + productReservedEvent.getProductId()
                 + ", order ID: " + productReservedEvent.getOrderId());
     }
@@ -57,8 +60,15 @@ public class ProductEventHandler {
     @EventHandler
     public void on(ProductReservationCancelledEvent event){
         ProductEntity curStoredProduct = productRepository.findByProductId(event.getProductId());
+
+        LOG.info("Product Reservation Cancel Event: current product quantity: {}", curStoredProduct.getQuantity());
+
         int newQuantity = curStoredProduct.getQuantity() + event.getQuantity();
         curStoredProduct.setQuantity(newQuantity);
         productRepository.save(curStoredProduct);
+
+        // Test log
+        ProductEntity compensatedProduct = productRepository.findByProductId(event.getProductId());
+        LOG.info("Product Reservation Cancel Event: compensated product quantity: {}", compensatedProduct.getQuantity());
     }
 }

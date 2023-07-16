@@ -2,6 +2,7 @@ package com.nghiavt.paymentservice.cqrs.command;
 
 import com.nghiavt.common.commands.ProcessPaymentCommand;
 import com.nghiavt.common.events.PaymentProcessedEvent;
+import lombok.extern.slf4j.Slf4j;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
@@ -9,10 +10,10 @@ import org.axonframework.modelling.command.AggregateLifecycle;
 import org.axonframework.spring.stereotype.Aggregate;
 
 @Aggregate
+@Slf4j
 public class PaymentAggregate {
     @AggregateIdentifier
     private String paymentId;
-
     private String orderId;
 
     public PaymentAggregate() { }
@@ -31,11 +32,12 @@ public class PaymentAggregate {
         if(processPaymentCommand.getPaymentId() == null) {
             throw new IllegalArgumentException("Missing paymentId");
         }
-
-        AggregateLifecycle.apply(PaymentProcessedEvent.builder()
+        PaymentProcessedEvent event = PaymentProcessedEvent.builder()
                 .orderId(processPaymentCommand.getOrderId())
                 .paymentId(processPaymentCommand.getPaymentId())
-                .build());
+                .build();
+        AggregateLifecycle.apply(event);
+        log.info("Published Payment Processed Event: " + event.toString());
     }
 
     @EventSourcingHandler

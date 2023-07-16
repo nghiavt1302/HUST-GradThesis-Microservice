@@ -28,7 +28,7 @@ public class ProductCommandController {
                 .price(model.getPrice())
                 .quantity(model.getQuantity())
                 .title(model.getTitle())
-                .productId(UUID.randomUUID().toString())
+                .productId(UUID.randomUUID().toString().substring(0,8))
                 .build();
         String res;
         res = commandGateway.sendAndWait(createProductCommand);
@@ -37,6 +37,6 @@ public class ProductCommandController {
 //        } catch (Exception e) {
 //            res = e.getLocalizedMessage();
 //        }
-        return res;
+        return "Product created, productId: " + res;
     }
 }

@@ -6,7 +6,7 @@ import org.axonframework.modelling.command.TargetAggregateIdentifier;
 
 @Data
 @Builder
-public class ReverseProductCommand {
+public class ReserveProductCommand {
     @TargetAggregateIdentifier
     private final String productId;
     private final Integer quantity;
