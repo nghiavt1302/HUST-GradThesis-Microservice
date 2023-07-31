@@ -35,7 +35,7 @@ public class OrderAggregate {
                 .userId(createOrderCommand.getUserId())
                 .addressId(createOrderCommand.getAddressId())
                 .productId(createOrderCommand.getProductId())
-                .orderStatus(createOrderCommand.getOrderStatus())
+                .orderStatus(OrderStatus.CREATED)
                 .quantity(createOrderCommand.getQuantity()).build();
         AggregateLifecycle.apply(orderCreatedEvent);
         log.info("Published Order created event " + orderCreatedEvent.toString());

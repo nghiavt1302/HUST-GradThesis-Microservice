@@ -45,7 +45,7 @@ public class OrderSaga {
         ReserveProductCommand reserveProductCommand = ReserveProductCommand.builder()
                 .orderId(orderCreatedEvent.getOrderId())
                 .productId(orderCreatedEvent.getProductId())
-                .userId(orderCreatedEvent.getProductId())
+                .userId(orderCreatedEvent.getUserId())
                 .quantity(orderCreatedEvent.getQuantity())
                 .build();
 
@@ -55,7 +55,7 @@ public class OrderSaga {
             public void onResult(@Nonnull CommandMessage<? extends ReserveProductCommand> commandMessage,
                                  @Nonnull CommandResultMessage<?> commandResultMessage) {
                 if (commandResultMessage.isExceptional()){
-
+                    LOG.info("SAGA: exception");
                 }
             }
         });

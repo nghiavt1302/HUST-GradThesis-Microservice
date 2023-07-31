@@ -10,10 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class ProductQueryHanler {
+public class ProductQueryHandler {
     private final ProductRepository productRepository;
 
-    public ProductQueryHanler(ProductRepository productRepository) {
+    public ProductQueryHandler(ProductRepository productRepository) {
         this.productRepository = productRepository;
     }
     @QueryHandler
