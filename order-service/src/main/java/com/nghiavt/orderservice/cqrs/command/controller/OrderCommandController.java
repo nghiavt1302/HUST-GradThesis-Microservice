@@ -36,6 +36,6 @@ public class OrderCommandController {
                 .orderId(UUID.randomUUID().toString().substring(0,8))
                 .orderStatus(OrderStatus.CREATED)
                 .build();
-        return commandGateway.sendAndWait(createOrderCommand);
+        return "Order created, OrderID: " + commandGateway.sendAndWait(createOrderCommand);
     }
 }

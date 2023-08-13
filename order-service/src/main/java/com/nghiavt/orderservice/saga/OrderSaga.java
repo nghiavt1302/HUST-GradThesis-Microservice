@@ -1,5 +1,6 @@
 package com.nghiavt.orderservice.saga;
 
+import com.nghiavt.common.commands.CancelOrderCreationCommand;
 import com.nghiavt.common.commands.CancelProductReservationCommand;
 import com.nghiavt.common.commands.ProcessPaymentCommand;
 import com.nghiavt.common.commands.ReserveProductCommand;
@@ -55,7 +56,10 @@ public class OrderSaga {
             public void onResult(@Nonnull CommandMessage<? extends ReserveProductCommand> commandMessage,
                                  @Nonnull CommandResultMessage<?> commandResultMessage) {
                 if (commandResultMessage.isExceptional()){
-                    LOG.info("SAGA: exception");
+                    LOG.info("SAGA exception: {}", commandResultMessage.exceptionResult().getMessage());
+                    // Compensating.....
+                    LOG.info("Compensating transaction...........");
+                    rejectNotEnoughItemOrder(orderCreatedEvent, commandResultMessage.exceptionResult().getMessage());
                 }
             }
         });
@@ -143,6 +147,12 @@ public class OrderSaga {
                 .build();
         commandGateway.send(cancel);
         LOG.info("Send cancel product reservation command: " + cancel.toString());
+    }
+
+    private void rejectNotEnoughItemOrder(OrderCreatedEvent event, String reason){
+        RejectOrderCommand cancel = new RejectOrderCommand(event.getOrderId(), reason);
+        commandGateway.send(cancel);
+        LOG.info("Send cancel order creation command: " + cancel.toString());
     }
 
     @EndSaga
